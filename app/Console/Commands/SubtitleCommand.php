@@ -125,6 +125,7 @@ class SubtitleCommand extends Command
         $this->log(' --------------------------- OK OK ----------------------------' . PHP_EOL);
         $this->info('Total time: ' . (time() - $this->startTime) . ' s');
         $this->log('Total time: ' . (time() - $this->startTime) . ' s');
+        die;
         $this->sub = [];
         $this->start = -1;
         $this->startTime = 0;
