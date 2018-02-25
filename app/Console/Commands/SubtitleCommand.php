@@ -91,6 +91,7 @@ class SubtitleCommand extends Command
             if (!$this->getSubTitle($start, $info, $youtube, false, $last)) {
                 break;
             }
+            sleep(rand(5, 10));
         }
 
         $this->updateSubtitle($youtube->id);
