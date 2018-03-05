@@ -25,7 +25,7 @@ class FirstRecordCriteria implements CriteriaInterface
        //  $model = $model->whereNull('video_data')->limit(1);
        // $model = $model->whereNull('subtitle')->limit(1);
         // $model = $model->where(['s1' => 0])->limit(1000);
-        $model = $model->limit(1000)->offset(6000);
+        $model = $model->limit(1000)->offset(7000);
         return $model;
     }
 }

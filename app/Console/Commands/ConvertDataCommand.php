@@ -72,11 +72,11 @@ class ConvertDataCommand extends Command
      */
     public function handle()
     {
-        // $this->truncateTable();
-        // $this->processWordTypeTable();
-        // $this->processGroupsTable();
-        // $this->processWordsTable();        
-        $this->processYoutubeTable();
+         $this->truncateTable();
+         $this->processWordTypeTable();
+         $this->processGroupsTable();
+         $this->processWordsTable();
+//        $this->processYoutubeTable();
     }
 
     private function processWordTypeTable()
@@ -99,17 +99,27 @@ class ConvertDataCommand extends Command
     private function processYoutubeTable()
     {
         $this->youtubeRepository->pushCriteria(app(FirstRecordCriteria::class));
-        $youtubes = $this->youtubeRepository->all(['youtube_id', 'subtitle']);        
+        $youtubes = $this->youtubeRepository->all(['letter', 'youtube_id', 'subtitle']);
         if ($youtubes->isEmpty()) {
             $this->log('Youtube not found');
             return;
-        }        
+        }
+
+        if(!is_dir(storage_path('caption'))) {
+            mkdir(storage_path('caption'));
+        }
 
         foreach ($youtubes as $item) {
-            $record = new YoutubeSQLite();
-            $record->youtube_id = $item->youtube_id;
-            $record->subtitle = $item->subtitle;
-            $record->save();
+
+            $savePath = storage_path('caption/' . $item->letter);
+            if(!is_dir($savePath)) {
+                mkdir($savePath);
+            }
+            file_put_contents($savePath . '/' . $item->youtube_id . '.json', $item->subtitle);
+//            $record = new YoutubeSQLite();
+//            $record->youtube_id = $item->youtube_id;
+//            $record->subtitle = $item->subtitle;
+//            $record->save();
         }
         $this->log('Insert youtube data success');
     }
@@ -154,14 +164,14 @@ class ConvertDataCommand extends Command
 
     private function truncateTable()
     {
-        // WordTypeSQLite::truncate();
-        // $this->warn('Truncate table: word_type');
-        // GroupSQLite::truncate();
-        // $this->warn('Truncate table: groups');
-        // WordSQLite::truncate();
-        // $this->warn('Truncate table: words');
-        YoutubeSQLite::truncate();
-        $this->warn('Truncate table: youtube');
+         WordTypeSQLite::truncate();
+         $this->warn('Truncate table: word_type');
+         GroupSQLite::truncate();
+         $this->warn('Truncate table: groups');
+         WordSQLite::truncate();
+         $this->warn('Truncate table: words');
+//        YoutubeSQLite::truncate();
+//        $this->warn('Truncate table: youtube');
     }
 
     private function log($message)
