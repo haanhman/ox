@@ -50,6 +50,7 @@ class YoutubeCommand extends Command
     {
         $this->wordRepository->pushCriteria(app(FirstRecordCriteria::class));
         $this->word = $this->wordRepository->findWhere(['crawler_video_done' => false])->first();
+        dd($this->word);
         if (empty($this->word)) {
             $this->log('End word');
             return;

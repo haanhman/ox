@@ -22,7 +22,9 @@ class FirstRecordCriteria implements CriteriaInterface
      */
     public function apply($model, RepositoryInterface $repository)
     {
-        $model = $model->whereNull('subtitle')->limit(1);
+        $model = $model->whereNull('video_data')->limit(1);
+//        $model->whereNotNull('video_data');
+//        $model = $model->whereNotNull('video_data')->where(['is_ok' => 0])->limit(500);
         return $model;
     }
 }

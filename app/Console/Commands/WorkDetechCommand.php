@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Criteria\FirstRecordCriteria;
 use App\Repositories\WordRepository;
 use Illuminate\Console\Command;
 
@@ -12,7 +13,7 @@ class WorkDetechCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'word:detech';
+    protected $signature = 'w:a';
 
     /**
      * The console command description.
@@ -39,6 +40,129 @@ class WorkDetechCommand extends Command
 
     private $word;
 
+    private function removeVideoError($words)
+    {
+        $videoError = array(
+            '-2aN-UpDoNQ',
+            '-cNJ97GaqLE',
+            '0jRwqPsvVfE',
+            '1jT_SeQ8eso',
+            '1rqQpyukUDM',
+            '1rSrILaL9PY',
+            '2ctu8NYJLkk',
+            '2oFFWtHOaaU',
+            '2VVW33El-Ew',
+            '3cZMEXyOAUs',
+            '3FF-_b3lKhQ',
+            '3Q3NblRa2X8',
+            '45fFgJipjOo',
+            '47bsVtJN_aE',
+            '5yBU1ELFXfk',
+            '74tzFCtmfbc',
+            '7TCnjTX78L8',
+            '873QIUSzNPM',
+            '8Y4DddMXsHk',
+            '93nnlpirqT0',
+            '9lFPMZrYLHQ',
+            'AEYQvKduCNY',
+            'AF21bMBAOGI',
+            'aWMCv4iOIHg',
+            'cKxQMyBl22o',
+            'CQBSoFxF0SA',
+            'd5Dwb0h8wHg',
+            'D9u3yvYx9sA',
+            'dy02o7MW3VA',
+            'etQJ1FUbOxk',
+            'fBN5nZc65YU',
+            'FJjW8bFBZQE',
+            'gE4ef0yQZRU',
+            'GWGG9YJXsy8',
+            'haqi4xvjvKo',
+            'I_kFyh3pPRE',
+            'i1LL6AoFnlY',
+            'IHY4pwx0-Wc',
+            'IkZ1eko1JUQ',
+            'iZ8so-ld-l0',
+            'j1S-Q2q0Cac',
+            'jHA4xN1dEkM',
+            'jPGKTeAfGdE',
+            'JsKjSqTxDXA',
+            'KhgFXRhHP_Q',
+            'kOxCtZSi_Jw',
+            'krBuOL0IKFQ',
+            'KyAw8aKnSxM',
+            'lDBEcxL6v4A',
+            'LlEhlw_d5N8',
+            'lmtDZpv_09g',
+            'm9nLB18X4Bc',
+            'mB98vBTwVO0',
+            'mT0RNrTDHkI',
+            'mucyTT8EK3Y',
+            'ndMmHIXTQgo',
+            'nE5RGSWONZ4',
+            'nmGaq9DsUfo',
+            'NSWctkkwa4Y',
+            'nt2OlMAJj6o',
+            'NYdhk7wtz3o',
+            'onfMaKyXeEQ',
+            'oYQIqNX4kvc',
+            'P-GtAWVzc40',
+            'P5PBDe0CSxs',
+            'PNAikyqTErc',
+            'povSSX2r4Xc',
+            'pwuuAPsE9UQ',
+            'pxYqvczO6DI',
+            'Qf9ORDmvBxo',
+            'R-bypPCIE9g',
+            'RFDhWK6RSNc',
+            'rSgPZTREKQA',
+            't69L1kSkMrw',
+            't7thpDI75IA',
+            'TZNi5uWJwXY',
+            'U6S9c4UFyGk',
+            'UpBycmR3_lQ',
+            'V9RrWvo9ucw',
+            'VLZ3gJWwvcI',
+            'vrHPzuU8sIU',
+            'vsbm1CbM03I',
+            'WHm3xI943aA',
+            'X1qD-ySmtiI',
+            'xImqF2-oaf8',
+            'xrUC2QKMYeg',
+            'YhCWJQR7AMA',
+            'yrA3-NcwsbY',
+            'zOEdUV8TuCA',
+            'ZQOHPBxqDcw',
+            'zR6qKBC_j58',
+            'Zx1qHGDTauA'
+        );
+        foreach ($words as $item) {
+            $json = array();
+            $data = json_decode($item->video_data, true);
+            if(empty($data)) {
+                continue;
+            }
+            foreach ($data as $accent => $videoData) {
+                $results = collect($videoData['results']);
+                foreach ($results as $v) {
+                    if(in_array($v['vid'], $videoError)) {
+                        continue;
+                    }
+                    $json[$accent][] = [
+                        'start' => number_format($v['start'],2, '.', ''),
+                        'vid' => $v['vid'],
+                        'text' => $v['display'],
+                    ];
+                }
+            }
+            $this->wordRepository->update([
+                'is_ok' => true,
+                'video_data' => json_encode($json),
+            ], $item->id);
+        }
+    }
+
+
     /**
      * Execute the console command.
      *
@@ -46,11 +170,18 @@ class WorkDetechCommand extends Command
      */
     public function handle()
     {
-        $this->word = $this->wordRepository->findWhere(['is_ok' => false])->first();
-        if (empty($this->word)) {
+        $this->wordRepository->pushCriteria(app(FirstRecordCriteria::class));
+        $words = $this->wordRepository->get();
+
+        if ($words->isEmpty()) {
             $this->log('End word');
             return;
         }
+
+        $this->removeVideoError($words);
+        $this->info('Xong');
+        return;
+
         $url = $this->word->url;
         $html = get_web_page($url);
         if (empty($html)) {
@@ -144,7 +275,7 @@ class WorkDetechCommand extends Command
                     $eg[] = trim_space($e->text());
                 }
             }
-            if($li->find('.def', 0)) {
+            if ($li->find('.def', 0)) {
                 $uses[] = [
                     'desc' => trim_space($li->find('.def', 0)->text()),
                     'eg' => $eg
