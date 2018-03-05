@@ -17,7 +17,7 @@ class CreateTableWordsSqlite extends Migration
             $table->increments('id');
             $table->integer('group_id')->index();
             $table->string('name');
-            $table->string('word_type');
+            $table->integer('word_type')->index();
             $table->longText('use');
             $table->longText('video_data');
             $table->longText('audio_data');

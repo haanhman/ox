@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "875fbc91dcbe33a1f5ba70b61a6e1377",
+    "content-hash": "271644d682bf1f636953c06e76beb6aa",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -586,6 +586,61 @@
                 }
             ],
             "time": "2015-04-20T18:58:01+00:00"
+        },
+        {
+            "name": "jdavidbakr/replaceable-model",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jdavidbakr/replaceable-model.git",
+                "reference": "9773f0f1ec838a6a979e65ad703a41e17534f09e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jdavidbakr/replaceable-model/zipball/9773f0f1ec838a6a979e65ad703a41e17534f09e",
+                "reference": "9773f0f1ec838a6a979e65ad703a41e17534f09e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.1",
+                "php": "~5.5|~7.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "~3.0",
+                "phpunit/phpunit": "4.*",
+                "scrutinizer/ocular": "~1.1",
+                "squizlabs/php_codesniffer": "~2.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "jdavidbakr\\ReplaceableModel\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "J David Baker",
+                    "email": "me@jdavidbaker.com",
+                    "homepage": "http://www.jdavidbaker.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Adds 'REPLACE' and 'INSERT IGNORE' query capability to eloquent models",
+            "homepage": "https://github.com/jdavidbakr/replaceable-model",
+            "keywords": [
+                "jdavidbakr",
+                "replaceable-model"
+            ],
+            "time": "2017-12-20T02:18:35+00:00"
         },
         {
             "name": "laravel/framework",

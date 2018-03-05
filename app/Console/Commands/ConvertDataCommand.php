@@ -5,11 +5,14 @@ namespace App\Console\Commands;
 use App\Repositories\GroupRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YoutubeRepository;
+use App\Repositories\WordTypeRepository;
 use App\SQLite\GroupSQLite;
 use App\SQLite\WordSQLite;
 use App\SQLite\YoutubeSQLite;
+use App\SQLite\WordTypeSQLite;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use App\Criteria\FirstRecordCriteria;
 
 class ConvertDataCommand extends Command
 {
@@ -42,6 +45,8 @@ class ConvertDataCommand extends Command
      */
     private $youtubeRepository;
 
+    private $wordTypeRepository;
+
     /**
      * Create a new command instance.
      *
@@ -50,12 +55,14 @@ class ConvertDataCommand extends Command
     public function __construct(
         GroupRepository $groupRepository,
         WordRepository $wordRepository,
-        YoutubeRepository $youtubeRepository
+        YoutubeRepository $youtubeRepository,
+        WordTypeRepository $wordTypeRepository
     ) {
         parent::__construct();
         $this->groupRepository = $groupRepository;
         $this->wordRepository = $wordRepository;
         $this->youtubeRepository = $youtubeRepository;
+        $this->wordTypeRepository = $wordTypeRepository;
     }
 
     /**
@@ -65,20 +72,38 @@ class ConvertDataCommand extends Command
      */
     public function handle()
     {
-        $this->truncateTable();
-        $this->processGroupsTable();
-        $this->processWordsTable();
+        // $this->truncateTable();
+        // $this->processWordTypeTable();
+        // $this->processGroupsTable();
+        // $this->processWordsTable();        
         $this->processYoutubeTable();
+    }
 
+    private function processWordTypeTable()
+    {
+        $results = $this->wordTypeRepository->all();
+        if ($results->isEmpty()) {
+            $this->log('Word type not found');
+            return;
+        }
+
+        foreach ($results as $item) {
+            $record = new WordTypeSQLite();
+            $record->weight = $item->weight;
+            $record->name = $item->name;
+            $record->save();
+        }
+        $this->log('Insert word_type data success');
     }
 
     private function processYoutubeTable()
     {
-        $youtubes = $this->youtubeRepository->all();
+        $this->youtubeRepository->pushCriteria(app(FirstRecordCriteria::class));
+        $youtubes = $this->youtubeRepository->all(['youtube_id', 'subtitle']);        
         if ($youtubes->isEmpty()) {
             $this->log('Youtube not found');
             return;
-        }
+        }        
 
         foreach ($youtubes as $item) {
             $record = new YoutubeSQLite();
@@ -91,7 +116,7 @@ class ConvertDataCommand extends Command
 
     private function processWordsTable()
     {
-        $words = $this->wordRepository->all();
+        $words = $this->wordRepository->all(['group_id', 'name', 'wt', 'content', 'video_data', 'audio']);
         if ($words->isEmpty()) {
             $this->log('Word not found');
             return;
@@ -101,7 +126,7 @@ class ConvertDataCommand extends Command
             $record = new WordSQLite();
             $record->group_id = $item->group_id;
             $record->name = $item->name;
-            $record->word_type = $item->word_type;
+            $record->word_type = $item->wt;
             $record->use = $item->content;
             $record->video_data = $item->video_data;
             $record->audio_data = $item->audio;
@@ -129,10 +154,12 @@ class ConvertDataCommand extends Command
 
     private function truncateTable()
     {
-        GroupSQLite::truncate();
-        $this->warn('Truncate table: groups');
-        WordSQLite::truncate();
-        $this->warn('Truncate table: words');
+        // WordTypeSQLite::truncate();
+        // $this->warn('Truncate table: word_type');
+        // GroupSQLite::truncate();
+        // $this->warn('Truncate table: groups');
+        // WordSQLite::truncate();
+        // $this->warn('Truncate table: words');
         YoutubeSQLite::truncate();
         $this->warn('Truncate table: youtube');
     }

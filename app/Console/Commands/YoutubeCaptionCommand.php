@@ -71,10 +71,12 @@ class YoutubeCaptionCommand extends Command
         $this->info('Xong');
         return;
 
+        $youtube = $this->youtubeRepository->first();
         if (empty($youtube)) {
             $this->error('End data');
             die;
         }
+
         $this->yid = $youtube->id;
         $this->accent = $youtube->accent;
 
@@ -134,7 +136,7 @@ class YoutubeCaptionCommand extends Command
         $str = str_replace('\"', '"', $str);
         $str = str_replace('\\\'', '\'', $str);
         $str = str_replace('\\\"', '\\"', $str);
-        dd($str);
+        
         $json = json_decode($str, true);
         $urls = [];
         foreach ($json as $item) {
@@ -152,6 +154,7 @@ class YoutubeCaptionCommand extends Command
         if (empty($urls)) {
             $this->updateCaption([]);
         }
+        
         if ($this->accent == 'uk' && isset($urls['en-GB'])) {
             return $urls['en-GB'];
         } else {

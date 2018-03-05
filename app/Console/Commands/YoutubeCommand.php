@@ -49,8 +49,7 @@ class YoutubeCommand extends Command
     public function handle()
     {
         $this->wordRepository->pushCriteria(app(FirstRecordCriteria::class));
-        $this->word = $this->wordRepository->findWhere(['crawler_video_done' => false])->first();
-        dd($this->word);
+        $this->word = $this->wordRepository->findWhere(['crawler_video_done' => false])->first();        
         if (empty($this->word)) {
             $this->log('End word');
             return;

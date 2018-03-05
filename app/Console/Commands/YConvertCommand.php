@@ -65,6 +65,6 @@ class YConvertCommand extends Command
 
     private function insertYoutube($values)
     {
-        Youtube::insert($values);
+        Youtube::insertIgnore($values);
     }
 }
